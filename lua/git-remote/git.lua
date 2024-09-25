@@ -7,34 +7,39 @@ Exceptions = {
 	UNSUPPORTED_REMOTE = {},
 }
 
+---Check if current project is a Git repository
 ---@return boolean
 function M.is_git_repositor()
 	return utils.trim(vim.fn.system('git rev-parse --is-inside-work-tree 2> /dev/null || echo "false"')) == "true"
 end
 
----@param cmd string
----@return string
+---Execute git command
+---@param cmd string Command to be executed
+---@return string result Result of git command
 local function exec_git(cmd)
 	if not M.is_git_repositor() then
-		error(Exceptions.GIT_REPO_NOT_FOUND)
+		error("This is not a Git repository.", 0)
 	end
 	return utils.trim(vim.fn.system(string.format("git %s", cmd)))
 end
 
----@return string
+---Get current remote name
+---@return string remote
 function M.get_remote()
 	return exec_git("remote")
 end
 
----@param remote string
----@return string
+---Get remote repository URL
+---@param remote string Remote name
+---@return string url
 function M.get_remote_url(remote)
 	local url = exec_git(string.format("remote get-url %s", remote))
 	return url
 end
 
----@param url string
----@return string
+---Convert remote URL to repository link
+---@param url string Remote repostiory URL
+---@return string Link to repository
 local function parse_remote_url(url)
 	url = url:gsub(":([^/])", "/%1")
 	url = url:gsub("ssh://", "")
@@ -43,7 +48,8 @@ local function parse_remote_url(url)
 	return url
 end
 
----@return string
+---Get repository link for current project
+---@return string link
 function M.get_repo_url()
 	local remote = M.get_remote()
 	local remote_url = M.get_remote_url(remote)
@@ -51,28 +57,36 @@ function M.get_repo_url()
 	return url
 end
 
----@return string
+---@alias branch string
+---@alias commit string
+
+---Get current branch name
+---If head is currently detached, returns current commit instead
+---@return branch|commit ref Branch or commit reference
 function M.get_branch_or_commit()
 	local branch = exec_git("branch --show-current")
 	local commit = exec_git("rev-parse HEAD")
 	return branch ~= "" and branch or commit
 end
 
----@param url string
----@return string
+---Get template for link to specific file
+---The schema may vary depending on repository host (e.g. Gitlab or Github)
+---@param url string Link to remote repoitory
+---@return string template String template, it contains ${base_url} (repository base link), ${ref} (reference to commit) and ${filepath} (path to file) placeholders for interpolation
 local function get_file_url_format(url)
 	if url:find("gitlab") then
 		return "${base_url}/-/blob/${ref}/${filepath}"
 	elseif url:find("github") then
 		return "${base_url}/blob/${ref}/${filepath}"
 	else
-		error(Exceptions.UNSUPPORTED_REMOTE)
+		error("Unknown remote, only Github and Gitlab are currently supported.", 0)
 	end
 end
 
----@param file string
----@param lines any?
----@return string
+---Get link to file on remote repository
+---@param file string Filepath
+---@param lines [integer, integer]|nil Range of lines to be selected
+---@return string link Link to file
 M.get_remote_file_url = function(file, lines)
 	local base_url = M.get_repo_url()
 	local ref = M.get_branch_or_commit()
