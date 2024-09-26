@@ -54,7 +54,7 @@ autocompletion.setup(subcommand_tbl)
 wk.add({
 	{
 		"<leader>go",
-		"<cmd>GitRemote OpenCurrent --with-selection<cr>",
+		"<cmd>GitRemote OpenCurrent<cr>",
 		icon = { icon = icons.get("filetype", "git"), color = "orange" },
 		desc = "Open current file on remote",
 		mode = { "n", "v" },
