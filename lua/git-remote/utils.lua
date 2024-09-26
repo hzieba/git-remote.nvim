@@ -1,13 +1,15 @@
+local config = require("git-remote.config")
+
 local M = {}
 
----Trim string
+---Trim string.
 ---@param s string
 ---@return string
 function M.trim(s)
 	return s:match("^%s*(.-)%s*$")
 end
 
----Check if array contains an element
+---Check if array contains an element.
 ---@generic T: any
 ---@param table T[] Table to be scanned
 ---@param element T Element to be found
@@ -21,21 +23,24 @@ function M.contains(table, element)
 	return false
 end
 
----Open link in a browser
+---Open link in a browser.
 ---@param url string
 function M.open_browser(url)
-	vim.fn.system(string.format("open %s", url))
-	if vim.v.shell_error then
-		error("Unable to find command for opening links.", 0)
+	for _, cmd in ipairs(config.vars.browsers) do
+		vim.fn.system(string.format("%s %s", cmd, url))
+		if vim.v.shell_error == 0 then
+			return
+		end
 	end
+	error("Unable to find command for opening links.", 0)
 end
 
----Interpolate string with variables
----Use ${var_name} as a placeholders
+---Interpolate string with variables.
+---Use ${var_name} as a placeholders.
 ---
 ---E.g.
----> interpolate("Hello ${who}", { "who": "World! "})
----< "Hello World!"
+---> interpolate("Hello ${who}", { "who": "World! "}).
+---< "Hello World!".
 ---@param s string String template
 ---@param tab { [string]: string } Dictionary with variable values
 ---@return string string Interpolated string
@@ -45,13 +50,13 @@ function M.interpolate(s, tab)
 	end))
 end
 
----Get currently open file path
+---Get currently open file path.
 ---@return string path Path to file relative to project root
 function M.get_current_file()
 	return vim.fn.expand("%:.")
 end
 
----Get range of currently selected lines
+---Get range of currently selected lines.
 ---@return integer first First line of the selection
 ---@return integer last Last line of the selection
 function M.get_selected_lines()

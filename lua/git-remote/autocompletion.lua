@@ -1,5 +1,5 @@
----Guidelines for autocompletion
----https://github.com/nvim-neorocks/nvim-best-practices?tab=readme-ov-file#white_check_mark-do-1
+---Guidelines for autocompletion.
+---https://github.com/nvim-neorocks/nvim-best-practices?tab=readme-ov-file#white_check_mark-do-1.
 
 ---@class GitRemoteSubcommands
 ---@field impl fun(args: string[]) The subcommand implementation
@@ -7,7 +7,7 @@
 
 local M = {}
 
----Register subcommands
+---Register subcommands.
 ---@param subcommand_tbl table<string, GitRemoteSubcommands>
 function M.setup(subcommand_tbl)
 	---@param opts table :h lua-guide-commands-create

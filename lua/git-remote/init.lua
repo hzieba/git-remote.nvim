@@ -1,10 +1,14 @@
 local utils = require("git-remote.utils")
 local git = require("git-remote.git")
+local config = require("git-remote.config")
+
 local wk = require("which-key")
 local icons = require("mini.icons")
 local autocompletion = require("git-remote.autocompletion")
 
----Open current file in remote repository
+local M = {}
+
+---Open current file in remote repository.
 ---@param with_selection boolean? Whether or not to include selection in the link
 local function open_file_on_remote(with_selection)
 	local current_file = utils.get_current_file()
@@ -23,12 +27,12 @@ local function open_file_on_remote(with_selection)
 	end
 end
 
----Possible flags
+---Possible flags.
 local FLAGS = {
 	WITH_SELECTION = "--with-selection",
 }
 
----Subcommands implementation
+---Subcommands implementation.
 ---@type table<string, GitRemoteSubcommands>
 local subcommand_tbl = {
 	OpenCurrent = {
@@ -49,23 +53,29 @@ local subcommand_tbl = {
 	},
 }
 
-autocompletion.setup(subcommand_tbl)
+---@param opts opts?
+function M.setup(opts)
+	config.setup(opts)
+	autocompletion.setup(subcommand_tbl)
 
-wk.add({
-	{
-		"<leader>go",
-		"<cmd>GitRemote OpenCurrent<cr>",
-		icon = { icon = icons.get("filetype", "git"), color = "orange" },
-		desc = "Open current file on remote",
-		mode = { "n", "v" },
-	},
-})
-wk.add({
-	{
-		"<leader>gO",
-		"<cmd>GitRemote OpenCurrent --with-selection<cr>",
-		icon = { icon = icons.get("filetype", "git"), color = "orange" },
-		desc = "Open current file on remote with selected lines",
-		mode = { "n", "v" },
-	},
-})
+	wk.add({
+		{
+			"<leader>go",
+			"<cmd>GitRemote OpenCurrent<cr>",
+			icon = { icon = icons.get("filetype", "git"), color = "orange" },
+			desc = "Open current file on remote",
+			mode = { "n", "v" },
+		},
+	})
+	wk.add({
+		{
+			"<leader>gO",
+			"<cmd>GitRemote OpenCurrent --with-selection<cr>",
+			icon = { icon = icons.get("filetype", "git"), color = "orange" },
+			desc = "Open current file on remote with selected lines",
+			mode = { "n", "v" },
+		},
+	})
+end
+
+return M

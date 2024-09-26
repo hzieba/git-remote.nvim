@@ -1,4 +1,5 @@
 local utils = require("git-remote.utils")
+local config = require("git-remote..config")
 
 local M = {}
 
@@ -7,13 +8,13 @@ Exceptions = {
 	UNSUPPORTED_REMOTE = {},
 }
 
----Check if current project is a Git repository
+---Check if current project is a Git repository.
 ---@return boolean
 function M.is_git_repositor()
 	return utils.trim(vim.fn.system('git rev-parse --is-inside-work-tree 2> /dev/null || echo "false"')) == "true"
 end
 
----Execute git command
+---Execute git command.
 ---@param cmd string Command to be executed
 ---@return string result Result of git command
 local function exec_git(cmd)
@@ -23,13 +24,13 @@ local function exec_git(cmd)
 	return utils.trim(vim.fn.system(string.format("git %s", cmd)))
 end
 
----Get current remote name
+---Get current remote name.
 ---@return string remote
 function M.get_remote()
 	return exec_git("remote")
 end
 
----Get remote repository URL
+---Get remote repository URL.
 ---@param remote string Remote name
 ---@return string url
 function M.get_remote_url(remote)
@@ -37,7 +38,7 @@ function M.get_remote_url(remote)
 	return url
 end
 
----Convert remote URL to repository link
+---Convert remote URL to repository link.
 ---@param url string Remote repostiory URL
 ---@return string Link to repository
 local function parse_remote_url(url)
@@ -48,7 +49,7 @@ local function parse_remote_url(url)
 	return url
 end
 
----Get repository link for current project
+---Get repository link for current project.
 ---@return string link
 function M.get_repo_url()
 	local remote = M.get_remote()
@@ -60,8 +61,8 @@ end
 ---@alias branch string
 ---@alias commit string
 
----Get current branch name
----If head is currently detached, returns current commit instead
+---Get current branch name.
+---If head is currently detached, returns current commit instead.
 ---@return branch|commit ref Branch or commit reference
 function M.get_branch_or_commit()
 	local branch = exec_git("branch --show-current")
@@ -69,21 +70,21 @@ function M.get_branch_or_commit()
 	return branch ~= "" and branch or commit
 end
 
----Get template for link to specific file
----The schema may vary depending on repository host (e.g. Gitlab or Github)
+---Get template for link to specific file.
+---The schema may vary depending on repository host (e.g. Gitlab or Github).
 ---@param url string Link to remote repoitory
 ---@return string template String template, it contains ${base_url} (repository base link), ${ref} (reference to commit) and ${filepath} (path to file) placeholders for interpolation
 local function get_file_url_format(url)
-	if url:find("gitlab") then
-		return "${base_url}/-/blob/${ref}/${filepath}"
-	elseif url:find("github") then
-		return "${base_url}/blob/${ref}/${filepath}"
-	else
-		error("Unknown remote, only Github and Gitlab are currently supported.", 0)
+	for _, e in ipairs(config.vars.link_matchers) do
+		local regex, pattern = unpack(e)
+		if url:match(regex) then
+			return pattern
+		end
 	end
+	error("Unknown remote, please consider adding matcher to plugin configuration.", 0)
 end
 
----Get link to file on remote repository
+---Get link to file on remote repository.
 ---@param file string Filepath
 ---@param lines [integer, integer]|nil Range of lines to be selected
 ---@return string link Link to file
