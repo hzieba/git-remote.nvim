@@ -60,11 +60,11 @@ function M.setup(opts)
 
 	wk.add({
 		{
-			"<leader>go",
+			"<leader>gO",
 			"<cmd>GitRemote OpenCurrent<cr>",
 			icon = { icon = icons.get("filetype", "git"), color = "orange" },
 			desc = "Open current file on remote",
-			mode = { "n", "v" },
+			mode = "n",
 		},
 	})
 	wk.add({
@@ -73,7 +73,7 @@ function M.setup(opts)
 			"<cmd>GitRemote OpenCurrent --with-selection<cr>",
 			icon = { icon = icons.get("filetype", "git"), color = "orange" },
 			desc = "Open current file on remote with selected lines",
-			mode = { "n", "v" },
+			mode = "v",
 		},
 	})
 end

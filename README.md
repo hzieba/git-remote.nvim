@@ -26,10 +26,9 @@ opts = {
   link_templates = {
     -- Example configuration for Github
     {
-      -- Regex compared with remote repository URL to determine what syntax does it use
-      "^https?://[^/]*gitlab[^/]*/.*$",
-      -- Description how to generate file link from remote URL, reference to commit (branch) and path to file
-      "${base_url}/-/blob/${ref}/${filepath}" },
+      -- Key: regex compared with remote repository URL to determine what syntax does it use
+      -- Value: description how to generate file link from remote URL, reference to commit (branch) and path to file
+      ["^https?://[^/]*gitlab[^/]*/.*$"] = "${base_url}/-/blob/${ref}/${filepath}", 
     },
   },
   -- Set of commands for opening a browser
@@ -42,12 +41,10 @@ opts = {
 
 ## Keymaps
 
-| Mode     | Keymap       | Function                                                         |
-|----------|--------------|------------------------------------------------------------------|
-| `n`, `v` | `<leader>go` | Open current file on remote in browser.                          |
-| `n`, `v` | `<leader>gO` | Open current file on remote in browser (include selected lines). |
-
-See `GitRemote` for all commands.
+| Mode | Keymap       | Function                                                         |
+|------|--------------|------------------------------------------------------------------|
+| `n`  | `<leader>gO` | Open current file on remote in browser.                          |
+| `v`  | `<leader>gO` | Open current file on remote in browser (include selected lines). |
 
 ## TODO
 
