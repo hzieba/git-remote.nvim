@@ -75,8 +75,7 @@ end
 ---@param url string Link to remote repoitory
 ---@return string template String template, it contains ${base_url} (repository base link), ${ref} (reference to commit) and ${filepath} (path to file) placeholders for interpolation
 local function get_file_url_format(url)
-	for _, e in ipairs(config.vars.link_matchers) do
-		local regex, pattern = unpack(e)
+	for regex, pattern in pairs(config.vars.link_matchers) do
 		if url:match(regex) then
 			return pattern
 		end
